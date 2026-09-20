@@ -1,0 +1,45 @@
+# CI — lint y tests. Los jobs concretos se completan cuando existan
+# los módulos correspondientes.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  calc-core:
+    name: calc-core (TypeScript)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      # TODO: instalar deps y ejecutar `npm test` cuando exista package.json.
+      - name: Placeholder
+        run: echo "calc-core CI pendiente de configurar"
+
+  backend:
+    name: backend (Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      # TODO: instalar deps y ejecutar `pytest` cuando exista pyproject.toml.
+      - name: Placeholder
+        run: echo "backend CI pendiente de configurar"
+
+  frontend:
+    name: frontend (Next.js)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      # TODO: instalar deps y ejecutar `npm run lint && npm test` cuando exista package.json.
+      - name: Placeholder
+        run: echo "frontend CI pendiente de configurar"

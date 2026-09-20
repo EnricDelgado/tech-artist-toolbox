@@ -1,0 +1,69 @@
+# Tech Artist Toolbox — orquestación local
+#
+# Uso:
+#   docker compose up          → arranca db + backend + frontend
+#   docker compose up db       → solo Postgres (útil para desarrollo local)
+#   docker compose down -v     → derriba todo y borra volúmenes
+#
+# Puertos expuestos en el host:
+#   5432 → Postgres
+#   8000 → FastAPI (backend)
+#   3000 → Next.js  (frontend)
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: tat-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-toolbox}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-toolbox}
+      POSTGRES_DB: ${POSTGRES_DB:-toolbox}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-toolbox} -d ${POSTGRES_DB:-toolbox}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: tat-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-toolbox}:${POSTGRES_PASSWORD:-toolbox}@db:5432/${POSTGRES_DB:-toolbox}
+      API_CORS_ORIGINS: ${API_CORS_ORIGINS:-http://localhost:3000}
+      API_RATE_LIMIT_PER_MINUTE: ${API_RATE_LIMIT_PER_MINUTE:-60}
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - ./backend:/app
+      - ./shared-tests:/shared-tests:ro
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: tat-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000}
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    volumes:
+      - ./frontend:/app
+      - ./calc-core:/calc-core
+      - /app/node_modules
+
+volumes:
+  db-data:
