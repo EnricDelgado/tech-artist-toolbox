@@ -1,12 +1,24 @@
-# Placeholder — se completará al implementar el módulo backend.
-# Ver prompts/ y definicion-inicial.md §7.
+# Backend FastAPI — Tech Artist Toolbox
 FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
 WORKDIR /app
 
-# TODO(backend): copiar pyproject.toml/requirements.txt e instalar.
-# TODO(backend): copiar código de la app.
-# TODO(backend): CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Deps de sistema mínimas para psycopg[binary] y para el healthcheck (curl).
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# Placeholder: mantiene el contenedor vivo hasta que se genere la app real.
-CMD ["python", "-c", "import time; print('backend placeholder — pendiente de implementar'); time.sleep(3600)"]
+COPY requirements.txt ./
+RUN pip install -r requirements.txt
+
+COPY . .
+
+EXPOSE 8000
+
+# En arranque: aplica migraciones (idempotente) y luego lanza uvicorn.
+CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
