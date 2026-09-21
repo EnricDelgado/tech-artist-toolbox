@@ -1,0 +1,198 @@
+{
+  "texture.memory": [
+    {
+      "id": "rgba32-1024-no-mip",
+      "input": { "width": 1024, "height": 1024, "format": "RGBA32", "mipmaps": false, "count": 1 },
+      "expected": { "perTextureBytes": 4194304, "perTextureWithMipmapsBytes": 4194304, "totalBytes": 4194304, "warnings": [] },
+      "source": "RGBA32 = 4 bytes/pixel (Microsoft DXGI_FORMAT_R8G8B8A8 family, uncompressed). 1024x1024x4 = 4194304."
+    },
+    {
+      "id": "rgba32-1536-mipmaps",
+      "input": { "width": 1536, "height": 1536, "format": "RGBA32", "mipmaps": true, "count": 1 },
+      "expected": { "perTextureBytes": 9437184, "perTextureWithMipmapsBytes": 12582912, "totalBytes": 12582912, "warnings": [] },
+      "source": "RGBA32 4 B/px; full mip chain approx base x 4/3 (Real-Time Rendering, mipmap memory overhead). 1536x1536x4=9437184; x4/3=12582912 (exact, no rounding needed for this dimension)."
+    },
+    {
+      "id": "rgba32-2048-count4",
+      "input": { "width": 2048, "height": 2048, "format": "RGBA32", "mipmaps": false, "count": 4 },
+      "expected": { "perTextureBytes": 16777216, "perTextureWithMipmapsBytes": 16777216, "totalBytes": 67108864, "warnings": [] },
+      "source": "RGBA32 4 B/px x 4 textures, no mipmaps. Edge case: count > 1 must scale totalBytes linearly."
+    },
+    {
+      "id": "bc7-512-no-mip",
+      "input": { "width": 512, "height": 512, "format": "BC7", "mipmaps": false, "count": 1 },
+      "expected": { "perTextureBytes": 262144, "perTextureWithMipmapsBytes": 262144, "totalBytes": 262144, "warnings": [] },
+      "source": "Microsoft DXGI BC7: 16 bytes per 4x4 block. blocks=(512/4)^2=16384; x16=262144."
+    },
+    {
+      "id": "bc7-768-mipmaps",
+      "input": { "width": 768, "height": 768, "format": "BC7", "mipmaps": true, "count": 1 },
+      "expected": { "perTextureBytes": 589824, "perTextureWithMipmapsBytes": 786432, "totalBytes": 786432, "warnings": [] },
+      "source": "BC7 16 B/block, 4x4 blocks. 768/4=192 blocks/axis; 192^2x16=589824; x4/3=786432 (exact)."
+    },
+    {
+      "id": "bc7-1002-padding",
+      "input": { "width": 1002, "height": 1002, "format": "BC7", "mipmaps": false, "count": 1 },
+      "expected": { "perTextureBytes": 1008016, "perTextureWithMipmapsBytes": 1008016, "totalBytes": 1008016, "warnings": ["dimensions padded to 1004x1004 block-aligned size"] },
+      "source": "EDGE CASE (non-power-of-two, non-block-multiple dimensions). BC7 blocks are always 4x4; ceil(1002/4)=251 blocks/axis; 251^2x16=1008016 (Microsoft DXGI BC7 spec)."
+    },
+    {
+      "id": "astc4x4-768-mipmaps",
+      "input": { "width": 768, "height": 768, "format": "ASTC_4x4", "mipmaps": true, "count": 1 },
+      "expected": { "perTextureBytes": 589824, "perTextureWithMipmapsBytes": 786432, "totalBytes": 786432, "warnings": [] },
+      "source": "Khronos ASTC spec: fixed 16 bytes/block regardless of block footprint; a 4x4 block therefore has the same bytes/pixel as BC7. 192^2x16=589824; x4/3=786432."
+    },
+    {
+      "id": "astc6x6-1024-padding",
+      "input": { "width": 1024, "height": 1024, "format": "ASTC_6x6", "mipmaps": false, "count": 1 },
+      "expected": { "perTextureBytes": 467856, "perTextureWithMipmapsBytes": 467856, "totalBytes": 467856, "warnings": ["dimensions padded to 1026x1026 block-aligned size"] },
+      "source": "EDGE CASE: 1024 is not a multiple of 6. Khronos ASTC spec: 16 bytes/block, block=6x6 texels. ceil(1024/6)=171 blocks/axis; 171^2x16=467856. NOTE: the contract example in definicion-inicial.md Sec.9 (2048x2048 ASTC_6x6 -> 3355443 bytes) does not match this spec-based formula (it implies ~0.8 B/px instead of the correct 16/36=0.444 B/px); that example appears to be an AI-generated placeholder and must not be used as a reference value."
+    },
+    {
+      "id": "astc8x8-1001-padding",
+      "input": { "width": 1001, "height": 1001, "format": "ASTC_8x8", "mipmaps": false, "count": 1 },
+      "expected": { "perTextureBytes": 254016, "perTextureWithMipmapsBytes": 254016, "totalBytes": 254016, "warnings": ["dimensions padded to 1008x1008 block-aligned size"] },
+      "source": "EDGE CASE: 1001 is not a multiple of 8. Khronos ASTC spec: 16 bytes/block, block=8x8 texels. ceil(1001/8)=126 blocks/axis; 126^2x16=254016."
+    }
+  ],
+
+  "texture.compare": [
+    {
+      "id": "compare-1024-no-mip",
+      "input": { "width": 1024, "height": 1024, "mipmaps": false, "count": 1 },
+      "expected": {
+        "RGBA32": { "perTextureBytes": 4194304, "totalBytes": 4194304 },
+        "BC7": { "perTextureBytes": 1048576, "totalBytes": 1048576 },
+        "ASTC_4x4": { "perTextureBytes": 1048576, "totalBytes": 1048576 },
+        "ASTC_6x6": { "perTextureBytes": 467856, "totalBytes": 467856, "warnings": ["dimensions padded to 1026x1026"] },
+        "ASTC_8x8": { "perTextureBytes": 262144, "totalBytes": 262144 }
+      },
+      "source": "Per-format block math per Khronos ASTC spec + Microsoft DXGI BC7 spec. EDGE CASE: 1024 is not a multiple of 6, so only ASTC_6x6 needs padding to 1026x1026; the other formats align exactly."
+    },
+    {
+      "id": "compare-768-mipmaps",
+      "input": { "width": 768, "height": 768, "mipmaps": true, "count": 1 },
+      "expected": {
+        "RGBA32": { "perTextureBytes": 2359296, "perTextureWithMipmapsBytes": 3145728, "totalBytes": 3145728 },
+        "BC7": { "perTextureBytes": 589824, "perTextureWithMipmapsBytes": 786432, "totalBytes": 786432 },
+        "ASTC_4x4": { "perTextureBytes": 589824, "perTextureWithMipmapsBytes": 786432, "totalBytes": 786432 },
+        "ASTC_6x6": { "perTextureBytes": 262144, "perTextureWithMipmapsBytes": 349525, "totalBytes": 349525, "note": "mip factor 4/3 does not divide evenly here: 262144x4/3=349525.33 -> floor to nearest byte" },
+        "ASTC_8x8": { "perTextureBytes": 147456, "perTextureWithMipmapsBytes": 196608, "totalBytes": 196608 }
+      },
+      "source": "768 is exactly divisible by 4, 6 and 8 (no padding in any format), isolating the mip-chain x4/3 factor. EDGE CASE: ASTC_6x6 is the one format in this case where the x4/3 factor does not divide evenly -> defines the floor-to-nearest-byte rounding rule for mipmap totals."
+    },
+    {
+      "id": "compare-2048-count2",
+      "input": { "width": 2048, "height": 2048, "mipmaps": false, "count": 2 },
+      "expected": {
+        "RGBA32": { "perTextureBytes": 16777216, "totalBytes": 33554432 },
+        "BC7": { "perTextureBytes": 4194304, "totalBytes": 8388608 },
+        "ASTC_4x4": { "perTextureBytes": 4194304, "totalBytes": 8388608 },
+        "ASTC_6x6": { "perTextureBytes": 1871424, "totalBytes": 3742848, "warnings": ["dimensions padded to 2052x2052"] },
+        "ASTC_8x8": { "perTextureBytes": 1048576, "totalBytes": 2097152 }
+      },
+      "source": "count=2 scales totalBytes linearly for every format. EDGE CASE: 2048 is a multiple of 4 and 8 but not of 6 (ceil(2048/6)=342 blocks/axis, padded to 2052), exercising the ASTC_6x6 padding path at a different dimension than the other cases."
+    }
+  ],
+
+  "uv.texelDensity": [
+    {
+      "id": "td-basic-meters",
+      "input": { "textureResolution": 1024, "objectSize": 2, "unit": "m" },
+      "expected": { "texelDensityPxPerUnit": 512, "texelDensityPxPerMeter": 512, "texelDensityPxPerInch": 13.0048 },
+      "source": "density(px/m) = resolution / objectSize = 1024/2 = 512. 1 inch = 0.0254 m exactly (international yard/pound agreement, 1959); density(px/inch) = 512 x 0.0254 = 13.0048 (exact terminating decimal)."
+    },
+    {
+      "id": "td-target-density-pow2",
+      "input": { "objectSize": 4, "unit": "m", "targetDensity": 100 },
+      "expected": { "recommendedResolution": 512, "resultingDensityPxPerUnit": 128 },
+      "source": "EDGE CASE: resolution must round to nearest power of two. desired = targetDensity x objectSize = 400; nearest power of two between 256 and 512: |400-256|=144 > |400-512|=112, so 512 wins. resulting density = 512/4 = 128 px/m."
+    },
+    {
+      "id": "td-inch-exact",
+      "input": { "textureResolution": 2540, "objectSize": 10, "unit": "inch" },
+      "expected": { "texelDensityPxPerUnit": 254, "texelDensityPxPerInch": 254, "texelDensityPxPerMeter": 10000 },
+      "source": "EDGE CASE: inch unit, chosen so the 0.0254 m/inch conversion (exact by definition) lands on a whole number: 254 px/inch / 0.0254 m/inch = 10000 px/m exactly."
+    }
+  ],
+
+  "shader.math": [
+    {
+      "id": "lerp-basic",
+      "input": { "function": "lerp", "a": 0, "b": 10, "t": 0.25 },
+      "expected": { "result": 2.5 },
+      "source": "lerp(a,b,t) = a + (b-a)*t (HLSL lerp / GLSL mix)."
+    },
+    {
+      "id": "lerp-extrapolate",
+      "input": { "function": "lerp", "a": -5, "b": 5, "t": 1.5 },
+      "expected": { "result": 10 },
+      "source": "EDGE CASE: t outside [0,1]. HLSL/GLSL lerp does not clamp t; it extrapolates linearly beyond [a,b]. -5 + 10*1.5 = 10."
+    },
+    {
+      "id": "remap-basic",
+      "input": { "function": "remap", "value": 5, "inMin": 0, "inMax": 10, "outMin": 0, "outMax": 1 },
+      "expected": { "result": 0.5 },
+      "source": "remap(v,inMin,inMax,outMin,outMax) = outMin + (v-inMin)/(inMax-inMin) * (outMax-outMin)."
+    },
+    {
+      "id": "remap-extrapolate",
+      "input": { "function": "remap", "value": 15, "inMin": 0, "inMax": 10, "outMin": 0, "outMax": 100 },
+      "expected": { "result": 150 },
+      "source": "EDGE CASE: value outside [inMin,inMax]. remap does not clamp by default, so the result extrapolates outside [outMin,outMax]. (15-0)/10*100=150."
+    },
+    {
+      "id": "smoothstep-basic",
+      "input": { "function": "smoothstep", "edge0": 0, "edge1": 1, "x": 0.5 },
+      "expected": { "result": 0.5 },
+      "source": "smoothstep(e0,e1,x): t=clamp((x-e0)/(e1-e0),0,1); return t^2*(3-2t) (Khronos GLSL spec / HLSL smoothstep). t=0.5 -> 0.25*2=0.5."
+    },
+    {
+      "id": "smoothstep-below-edge0",
+      "input": { "function": "smoothstep", "edge0": 0, "edge1": 1, "x": -0.5 },
+      "expected": { "result": 0 },
+      "source": "EDGE CASE: x below edge0 clamps t to 0 per GLSL/HLSL spec, so the result is 0 regardless of how far below x is."
+    },
+    {
+      "id": "smoothstep-above-edge1",
+      "input": { "function": "smoothstep", "edge0": 0, "edge1": 10, "x": 20 },
+      "expected": { "result": 1 },
+      "source": "EDGE CASE: x above edge1 clamps t to 1 per GLSL/HLSL spec, so the result is 1 regardless of how far above x is."
+    }
+  ],
+
+  "color.convert": [
+    {
+      "id": "rgb-to-hex-hsl-red",
+      "input": { "rgb": { "r": 255, "g": 0, "b": 0 } },
+      "expected": { "hex": "#FF0000", "hsl": { "h": 0, "s": 100, "l": 50 } },
+      "source": "Standard RGB<->HSL conversion (CSS Color Module Level 3, section 7.2)."
+    },
+    {
+      "id": "hex-to-rgb-hsl-green",
+      "input": { "hex": "#00FF00" },
+      "expected": { "rgb": { "r": 0, "g": 255, "b": 0 }, "hsl": { "h": 120, "s": 100, "l": 50 } },
+      "source": "CSS Color Module Level 3, section 7.2."
+    },
+    {
+      "id": "linear-to-srgb-mid",
+      "input": { "direction": "linearToSrgb", "linear": 0.5 },
+      "expected": { "srgb": 0.735357 },
+      "tolerance": 0.0005,
+      "source": "IEC 61966-2-1 sRGB transfer function: srgb = 1.055 * linear^(1/2.4) - 0.055 for linear > 0.0031308. Tolerance allowed per shared-tests/README.md (curve involves a non-terminating power)."
+    },
+    {
+      "id": "linear-to-srgb-threshold",
+      "input": { "direction": "linearToSrgb", "linear": 0.0031308 },
+      "expected": { "srgb": 0.040449936 },
+      "source": "EDGE CASE: exactly at the IEC 61966-2-1 breakpoint. At/below linear=0.0031308 the linear segment applies: srgb = linear * 12.92 (exact multiplication, no tolerance needed). 0.0031308*12.92=0.040449936."
+    },
+    {
+      "id": "srgb-to-linear-threshold",
+      "input": { "direction": "srgbToLinear", "srgb": 0.04045 },
+      "expected": { "linear": 0.0031308 },
+      "tolerance": 0.0000001,
+      "source": "EDGE CASE: exactly at the IEC 61966-2-1 breakpoint from the sRGB side. At/below srgb=0.04045 the linear segment applies: linear = srgb / 12.92 = 0.04045/12.92 = 0.0031308 (matches the linear-side breakpoint to the precision published in the standard, confirming both constants are consistent)."
+    }
+  ]
+}
