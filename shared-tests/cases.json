@@ -64,7 +64,7 @@
         "RGBA32": { "perTextureBytes": 4194304, "totalBytes": 4194304 },
         "BC7": { "perTextureBytes": 1048576, "totalBytes": 1048576 },
         "ASTC_4x4": { "perTextureBytes": 1048576, "totalBytes": 1048576 },
-        "ASTC_6x6": { "perTextureBytes": 467856, "totalBytes": 467856, "warnings": ["dimensions padded to 1026x1026"] },
+        "ASTC_6x6": { "perTextureBytes": 467856, "totalBytes": 467856, "warnings": ["dimensions padded to 1026x1026 block-aligned size"] },
         "ASTC_8x8": { "perTextureBytes": 262144, "totalBytes": 262144 }
       },
       "source": "Per-format block math per Khronos ASTC spec + Microsoft DXGI BC7 spec. EDGE CASE: 1024 is not a multiple of 6, so only ASTC_6x6 needs padding to 1026x1026; the other formats align exactly."
@@ -88,7 +88,7 @@
         "RGBA32": { "perTextureBytes": 16777216, "totalBytes": 33554432 },
         "BC7": { "perTextureBytes": 4194304, "totalBytes": 8388608 },
         "ASTC_4x4": { "perTextureBytes": 4194304, "totalBytes": 8388608 },
-        "ASTC_6x6": { "perTextureBytes": 1871424, "totalBytes": 3742848, "warnings": ["dimensions padded to 2052x2052"] },
+        "ASTC_6x6": { "perTextureBytes": 1871424, "totalBytes": 3742848, "warnings": ["dimensions padded to 2052x2052 block-aligned size"] },
         "ASTC_8x8": { "perTextureBytes": 1048576, "totalBytes": 2097152 }
       },
       "source": "count=2 scales totalBytes linearly for every format. EDGE CASE: 2048 is a multiple of 4 and 8 but not of 6 (ceil(2048/6)=342 blocks/axis, padded to 2052), exercising the ASTC_6x6 padding path at a different dimension than the other cases."
