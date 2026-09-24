@@ -1,5 +1,4 @@
-# CI — lint y tests. Los jobs concretos se completan cuando existan
-# los módulos correspondientes.
+# CI — lint, typecheck y tests para calc-core, backend y frontend.
 name: ci
 
 on:
@@ -11,35 +10,71 @@ jobs:
   calc-core:
     name: calc-core (TypeScript)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: calc-core
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      # TODO: instalar deps y ejecutar `npm test` cuando exista package.json.
-      - name: Placeholder
-        run: echo "calc-core CI pendiente de configurar"
+          cache: npm
+          cache-dependency-path: calc-core/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Tests
+        run: npm test
+      - name: Build
+        run: npm run build
 
   backend:
     name: backend (Python)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      # TODO: instalar deps y ejecutar `pytest` cuando exista pyproject.toml.
-      - name: Placeholder
-        run: echo "backend CI pendiente de configurar"
+          cache: pip
+          cache-dependency-path: backend/requirements-dev.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+      - name: Tests (paridad con calc-core + endpoints)
+        env:
+          DATABASE_URL: ''
+          API_RATE_LIMIT_PER_MINUTE: '10000'
+        run: pytest
 
   frontend:
     name: frontend (Next.js)
     runs-on: ubuntu-latest
+    needs: calc-core   # necesita el dist/ de calc-core para resolver file:../calc-core.
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      # TODO: instalar deps y ejecutar `npm run lint && npm test` cuando exista package.json.
-      - name: Placeholder
-        run: echo "frontend CI pendiente de configurar"
+          cache: npm
+      - name: Build calc-core (dependencia local)
+        working-directory: calc-core
+        run: |
+          npm ci
+          npm run build
+      - name: Install frontend deps
+        working-directory: frontend
+        run: npm install --no-audit --no-fund
+      - name: Typecheck
+        working-directory: frontend
+        run: npm run typecheck
+      - name: Build
+        working-directory: frontend
+        env:
+          NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
+        run: npm run build
