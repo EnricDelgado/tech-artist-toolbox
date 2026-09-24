@@ -4,7 +4,9 @@
 **Autor:** Enric Delgado Claramunt
 **Asistente principal:** Claude Code (Anthropic) — modelos Claude Sonnet 5 y Claude Opus 4.7
 **Fecha del informe:** 24/09/2026
-**Repositorio:** `Actividad1/tech-artist-toolbox/`
+**Repositorio:** <https://github.com/EnricDelgado/tech-artist-toolbox>
+**App desplegada:** <https://tech-artist-toolbox.vercel.app>
+**API:** <https://tech-artist-toolbox-backend.onrender.com> · Swagger UI en `/docs`
 **Documento origen:** `psuiadesoft02_act1.docx`
 
 ---

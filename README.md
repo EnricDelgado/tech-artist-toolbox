@@ -8,6 +8,26 @@ Este proyecto se ha desarrollado íntegramente asistido por IA, en el marco de
 la Actividad 1 de la asignatura de Automatizaciones. Toda decisión, prompt,
 error y corrección relevantes están registrados en `prompts/`.
 
+## En producción
+
+| Recurso | URL |
+|---------|-----|
+| Aplicación | <https://tech-artist-toolbox.vercel.app> |
+| API | <https://tech-artist-toolbox-backend.onrender.com> |
+| Swagger UI | <https://tech-artist-toolbox-backend.onrender.com/docs> |
+| Healthcheck | <https://tech-artist-toolbox-backend.onrender.com/healthz> |
+| Código fuente | <https://github.com/EnricDelgado/tech-artist-toolbox> |
+
+Verificado en producción el 24/09/2026: paridad cliente/servidor (botón
+"Verificar con API" en verde), CORS restringido a la URL de Vercel, Neon
+Postgres respondiendo con `GET /api/v1/projects → 200 []` (migración de
+Alembic aplicada al arrancar).
+
+Infraestructura: **GitHub** (repo público) + **Vercel** (frontend Next.js) +
+**Render** (backend Docker) + **Neon** (Postgres). Todo en tiers gratuitos.
+El backend duerme tras 15 min de inactividad; la primera petición tras un
+rato tarda ~30 s en despertar el contenedor.
+
 ## Estructura
 
 ```

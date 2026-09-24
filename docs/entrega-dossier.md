@@ -155,12 +155,14 @@ Los tres extractos más valiosos para el criterio 2 (prompts) y 4
 
 ## 4. Enlaces a incluir en el PDF y en el docx
 
-- Repositorio (a rellenar cuando lo subas):
-  `https://github.com/<usuario>/tech-artist-toolbox`.
-- URL pública de la app (si se despliega): `https://<sub>.vercel.app`.
-- OpenAPI en producción: `https://<backend>/docs`.
-- Si se opta por Opción A (entrega solo local): omitir las tres anteriores
-  y sustituir por instrucciones `docker compose up`.
+- **Repositorio:** <https://github.com/EnricDelgado/tech-artist-toolbox>
+- **App desplegada:** <https://tech-artist-toolbox.vercel.app>
+- **API en producción:** <https://tech-artist-toolbox-backend.onrender.com>
+- **Swagger UI:** <https://tech-artist-toolbox-backend.onrender.com/docs>
+- **Healthcheck:** <https://tech-artist-toolbox-backend.onrender.com/healthz>
+
+Verificado en producción el 24/09/2026 (los cuatro endpoints anteriores
+responden 200; paridad cliente/servidor en verde).
 
 ## 5. Capturas de pantalla — checklist para tomarlas
 
