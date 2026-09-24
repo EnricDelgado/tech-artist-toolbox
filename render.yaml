@@ -1,0 +1,25 @@
+# Render Blueprint — Tech Artist Toolbox
+#
+# Se usa desde https://dashboard.render.com/select-repo → New Blueprint.
+# Render lee este fichero y crea el servicio con la config que hay aquí.
+# Las variables marcadas con `sync: false` NO se sincronizan desde este
+# fichero: el usuario las rellena a mano en el dashboard tras la creación.
+
+services:
+  - type: web
+    name: tech-artist-toolbox-backend
+    runtime: docker
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    region: frankfurt          # cambia si prefieres otra región
+    branch: main
+    autoDeploy: true
+    healthCheckPath: /healthz
+    envVars:
+      - key: DATABASE_URL
+        sync: false            # connection string de Neon (con scheme postgresql+psycopg://)
+      - key: API_CORS_ORIGINS
+        sync: false            # URL pública del frontend en Vercel
+      - key: API_RATE_LIMIT_PER_MINUTE
+        value: "60"

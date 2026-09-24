@@ -53,10 +53,15 @@ def create_app() -> FastAPI:
     )
 
     # CORS.
+    # `allow_credentials=False` porque la API no usa cookies ni auth basada en
+    # navegador. Esto permite además usar `allow_origins=["*"]` sin que el
+    # navegador rechace la respuesta (regla del CORS spec: credentials +
+    # wildcard es incompatible). En producción se sustituye el "*" por la URL
+    # exacta del frontend vía la env var API_CORS_ORIGINS.
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins_list,
-        allow_credentials=True,
+        allow_credentials=False,
         allow_methods=["*"],
         allow_headers=["*"],
     )
