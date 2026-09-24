@@ -41,3 +41,6 @@ htmlcov/
 
 # Docker (volúmenes montados en dev)
 db-data/
+
+# Scratchpad local (logs, dumps de CI, etc.). No entra al repo.
+temp/
