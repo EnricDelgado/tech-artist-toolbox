@@ -50,8 +50,9 @@ services:
 
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      # Contexto raíz para que el multistage vea calc-core y frontend.
+      context: .
+      dockerfile: frontend/Dockerfile
     container_name: tat-frontend
     restart: unless-stopped
     depends_on:
@@ -60,10 +61,6 @@ services:
       NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000}
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
-    volumes:
-      - ./frontend:/app
-      - ./calc-core:/calc-core
-      - /app/node_modules
 
 volumes:
   db-data:

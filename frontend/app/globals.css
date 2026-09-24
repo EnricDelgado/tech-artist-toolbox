@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html, body { height: 100%; }
+
+body {
+  @apply bg-surface-950 text-slate-100 antialiased;
+}
+
+.card {
+  @apply rounded-lg bg-surface-900 border border-surface-800 p-5;
+}
+
+.label {
+  @apply block text-sm text-slate-400 mb-1;
+}
+
+.input {
+  @apply w-full rounded-md bg-surface-950 border border-surface-700 px-3 py-2
+         text-slate-100 focus:outline-none focus:border-accent-500;
+}
+
+.btn {
+  @apply inline-flex items-center gap-2 rounded-md bg-accent-500 text-surface-950
+         font-medium px-4 py-2 hover:bg-accent-400 disabled:opacity-50;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center gap-2 rounded-md bg-surface-800 text-slate-100
+         font-medium px-4 py-2 hover:bg-surface-700 border border-surface-700;
+}
+
+.formula {
+  @apply font-mono text-xs text-slate-400 bg-surface-950 border border-surface-800
+         rounded px-2 py-1 inline-block;
+}
