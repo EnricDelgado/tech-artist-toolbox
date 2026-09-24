@@ -9,13 +9,14 @@ on:
 jobs:
   calc-core:
     name: calc-core (TypeScript)
-    runs-on: ubuntu-latest
+    # Pin explícito: ubuntu-latest migra a Ubuntu 26 el 19-oct-2026.
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: calc-core
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: '20'
           cache: npm
@@ -31,13 +32,13 @@ jobs:
 
   backend:
     name: backend (Python)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: backend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
           cache: pip
@@ -54,11 +55,11 @@ jobs:
 
   frontend:
     name: frontend (Next.js)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: calc-core   # necesita el dist/ de calc-core para resolver file:../calc-core.
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: '20'
           cache: npm
