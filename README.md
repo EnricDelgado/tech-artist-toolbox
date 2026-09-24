@@ -56,11 +56,25 @@ docker compose up db
 
 ## Estado del MVP
 
-Pendiente:
-
-- [ ] `calc-core` (fórmulas + tests)
-- [ ] `shared-tests/cases.json`
-- [ ] Backend FastAPI (endpoints v1)
-- [ ] Frontend Next.js (calculadoras + perfiles)
+- [x] `shared-tests/cases.json` (27 casos, referencias oficiales)
+- [x] `calc-core` TypeScript (49 tests verdes)
+- [x] Backend FastAPI + Alembic (18 tests, paridad con `calc-core`)
+- [x] Frontend Next.js (5 calculadoras + perfiles + verify contra API)
 - [ ] CI (lint + tests)
-- [ ] Despliegue
+- [ ] Despliegue en producción — ver [`docs/despliegue.md`](docs/despliegue.md)
+      para las tres alternativas (mínima con Docker, recomendada con
+      GitHub + Vercel + Render + Neon, todo en Fly.io).
+
+## Tests locales
+
+```bash
+# calc-core
+cd calc-core && npm install && npm test     # 49 tests
+
+# backend
+cd backend && python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements-dev.txt && pytest    # 18 tests
+
+# frontend (build + typecheck; sin tests unitarios de UI en el MVP)
+cd frontend && npm install && npm run build
+```
